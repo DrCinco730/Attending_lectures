@@ -1,5 +1,9 @@
+from datetime import datetime
+
 from bs4 import BeautifulSoup
 from playwright.sync_api import Page, sync_playwright
+
+import send_log
 
 
 class Get:
@@ -11,7 +15,7 @@ class Get:
         self.timeout = 99999999
 
         page.goto(url="https://bannservices.seu.edu.sa/ssomanager/c/SSB?pkg=bwskfshd.P_CrseSchdDetl",
-                  timeout=self.timeout)
+                  timeout=self.timeout, wait_until="load")
         page.fill(selector='input[id="username"]', value=self.user)
         page.fill(selector='input[id="password"]', value=self.password)
         page.click(selector='button[type="submit"]')
@@ -52,6 +56,45 @@ class Get:
 
                 self.sub_data[check.nth(i - 1).inner_text()] = data
             i += 1
+        page.close()
 
     def get_schedule(self):
+        send_log.Login("getSchedule")
         return self.sub_data
+
+
+def ReturnNone():
+    return None
+
+
+class GetClasses:
+    def __init__(self, data):
+        self.result=None
+        today = datetime.now().date()
+        current_time = datetime.now().time()
+        today_name = datetime.now().strftime('%A')
+        today_name = today_name[:2] if today_name.startswith("T") else today_name[:1]
+
+        for course, class_list in data.items():
+            for class_info in class_list:
+                start_date, end_date = map(lambda x: datetime.strptime(x.strip(), '%d/%m/%Y'),
+                                           class_info['Date Range'].split(' - '))
+                if start_date.date() <= today <= end_date.date() and class_info['Days'] == today_name:
+                    start_time, end_time = map(lambda x: datetime.strptime(x.strip(), '%I:%M %p').time(),
+                                               class_info['Time'].split(' - '))
+                    if start_time <= current_time <= end_time:
+
+                        time1 = datetime.combine(today, start_time)
+                        time2 = datetime.combine(today, end_time)
+                        time_diff = time2 - time1
+                        seconds_diff = time_diff.total_seconds()
+
+                        self.result = course[course.find("-") + 1:course.rfind("-")].strip().replace(" ",
+                                                                                                     "-"), seconds_diff
+                        send_log.Login("timeStart")
+
+                    else:
+                        ReturnNone()
+
+    def DictTime(self):
+        return self.result

@@ -1,0 +1,9 @@
+{
+    "session-statistics.panel-state": "true",
+    "new.tutorials-menu-button.private-chat": "true",
+    "ftue.announcement.introduction": "true",
+    "apollo.hidesrnotification": "true",
+    "techcheck.devices.rtc": {"audioSourceID":"i1alBzkzpFe7L3OIIwXZzLJ9G6HpfDG4zyMCHWQ62bU=","videoSourceID":"kltBjVK4L2O4h5F7nuYUgzirAJCQaXOx7XKGO2eX1fM=","audioSource":"[{\"id\":\"i1alBzkzpFe7L3OIIwXZzLJ9G6HpfDG4zyMCHWQ62bU=\",\"label\":\"Microphone (Realtek High Definition Audio)\",\"selected\":true}]","videoSource":"[{\"id\":\"kltBjVK4L2O4h5F7nuYUgzirAJCQaXOx7XKGO2eX1fM=\",\"label\":\"TOSHIBA Web Camera - HD\",\"selected\":true}]"},
+    "techcheck.initial-techcheck":"complete",
+    "techcheck.status":"complete"
+}

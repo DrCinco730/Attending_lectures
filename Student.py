@@ -1,8 +1,9 @@
 from time import sleep
 from urllib.parse import parse_qs, urlparse
 from bs4 import BeautifulSoup
-from requests import get
 from playwright.sync_api import Page
+
+import send_log
 
 
 def GetState(page):
@@ -36,7 +37,7 @@ class GetIdSubjects:
             while True:
                 button = self.page.query_selector('#agree_button')
                 if button is not None:
-                    button.click()
+                    button.click(timeout=self.timeout)
                     break
             self.name_id = {}
             for x in BeautifulSoup(self.page.query_selector("#_4_1termCourses_noterm > ul").inner_html(),
@@ -64,12 +65,13 @@ class LogWebsite:
 
         self.page.goto(
             f"https://lms.seu.edu.sa/webapps/collab-ultra/tool/collabultra/lti/launch?course_id={self.subject}",
-            timeout=self.timeout)
+            timeout=self.timeout, wait_until="load")
+
         self.page.wait_for_load_state("networkidle", timeout=self.timeout)
         self.page.wait_for_load_state("domcontentloaded", timeout=self.timeout)
         self.page.wait_for_load_state("load", timeout=self.timeout)
 
-        self.page.click('div[class="item-list__item-details"]')
+        self.page.wait_for_selector(selector='div.item-list__item-details', timeout=self.timeout).click()
 
         self.page.wait_for_load_state("networkidle", timeout=self.timeout)
         self.page.wait_for_load_state("domcontentloaded", timeout=self.timeout)
@@ -80,5 +82,22 @@ class LogWebsite:
         self.page.wait_for_load_state("networkidle", timeout=self.timeout)
         self.page.wait_for_load_state("domcontentloaded", timeout=self.timeout)
         self.page.wait_for_load_state("load", timeout=self.timeout)
+        send_log.Login("open")
 
-        sleep(3600)#int(timeForEnd))
+        while True:
+            try:
+                self.page.click("div.techcheck-permissions button.close")
+                break
+            except:
+                pass
+        while True:
+            try:
+                self.page.click('button.close[aria-label="Close announcement"]')
+                break
+            except:
+                pass
+
+        sleep(timeForEnd)
+        page.close()
+        send_log.Login("complete")
+
